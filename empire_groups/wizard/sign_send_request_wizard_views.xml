@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sign_send_request_inherit_views" model="ir.ui.view">
+        <field name="name">sign_send_request_inherit_views</field>
+        <field name="model">sign.send.request</field>
+        <field name="inherit_id" ref="sign.sign_send_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='signer_id']" position="after">
+                <field name="hr_employee_group_id" invisible="has_default_template"/>
+            </xpath>
+            <xpath expr="//field[@name='signer_id']" position="attributes">
+               <attribute name="invisible">signers_count != 0 or not template_id or has_default_template</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
