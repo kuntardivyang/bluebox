@@ -11,6 +11,6 @@
         "security/ir.model.access.csv",
         "views/hr_employee_groups_views.xml",
         "views/menu.xml",
-        "wizard/sign_send_request_wizard_views.xml",
+        # "wizard/sign_send_request_wizard_views.xml",
     ],
 }

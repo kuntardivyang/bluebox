@@ -1,4 +1,6 @@
-from odoo import models, fields
+from odoo import models, fields, Command, _
+from odoo.exceptions import UserError
+
 
 class HREmployeeGroups(models.Model):
     _name = 'hr.employee.groups'
@@ -77,3 +79,64 @@ class HREmployeeGroups(models.Model):
             # if partners:
             #     document._send_access_by_mail(partners)
     
+    def action_send_sign_request(self):
+        self.ensure_one()
+        if not self.template_id:
+            raise UserError(_("Please set a signature template for this group."))
+        employees = self.employee_ids.filtered(lambda e: e.work_contact_id)
+        if not employees:
+            raise UserError(_("No employees with a work contact (partner) found in this group."))
+        roles = self.template_id.sign_item_ids.mapped('responsible_id').filtered(lambda r: r)
+        if not roles or len(roles) == 1:
+            if not roles:
+                role = self.env.ref('sign.sign_item_role_default')
+            else:
+                role = roles[0]
+            request_items = [
+                Command.create({
+                    'partner_id': employee.work_contact_id.id,
+                    'role_id': role.id,
+                    'mail_sent_order': 1,
+                })
+                for employee in employees
+            ]
+            self.env['sign.request'].with_context(skip_role_validation=True).create({
+                'template_id': self.template_id.id,
+                'request_item_ids': request_items,
+                'reference': self.template_id.name or self.template_id.attachment_id.name,
+                'subject': _('Signature Request - %s', self.template_id.attachment_id.name or ''),
+            })
+        else:
+            for employee in employees:
+                request_items = [
+                    Command.create({
+                        'partner_id': employee.work_contact_id.id,
+                        'role_id': role.id,
+                        'mail_sent_order': 1,
+                    })
+                    for role in roles
+                ]
+                self.env['sign.request'].with_context(skip_role_validation=True).create({
+                    'template_id': self.template_id.id,
+                    'request_item_ids': request_items,
+                    'reference': self.template_id.name or self.template_id.attachment_id.name,
+                    'subject': _('Signature Request - %s', self.template_id.attachment_id.name or ''),
+                })
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Signature Requests Sent'),
+                'message': _('Signature requests have been sent to the selected employees.'),
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    
+class SignRequest(models.Model):
+    _inherit = "sign.request"
+
+    def _check_signers_roles_validity(self):
+        if self.env.context.get('skip_role_validation'):
+            return True
+        return super()._check_signers_roles_validity()
