@@ -4,35 +4,36 @@
         <field name="name">hr.employee.groups.view.form</field>
         <field name="model">hr.employee.groups</field>
         <field name="arch" type="xml">
-            <form string="">
+            <form string="employee_groups">
+                <header>
+                    <button class="oe_highlight" string="Custom Email" />
+                </header>
                 <sheet>
                     <group>
                         <field name="name" string="Group Name" required="1" />
                         <field name="description" string="Description" />
-
-                        <div class="o_row">
-                            <div class="o_cell">
-                                <group>
-                                    <field name="template_id" string="Template" required="1" />
-                                </group>
-                            </div>
-                            <div class="o_cell" style="margin-left: 16px; margin-top: 8px;">
-                                <button name="action_send_sign_request" type="object" class="oe_highlight" string="Send"/>
-                            </div>
-                        </div>
-                        <div class="o_row">
-                            <div class="o_cell">
-                                <group>
-                                    <field name="document_id" string="Document" />
-                                </group>
-                            </div>
-                            <div class="o_cell" style="margin-left: 16px; margin-top: 8px;">
-                                <button name="action_share_documents_direct" type="object" class="btn btn-primary" string="Share" />
-                            </div>
-                        </div>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="template_id" string="Template" required="1" />
+                        </group>
+                        <group>
+                            <button name="action_send_sign_request" type="object" class="oe_highlight" string="Send"/>
+                        </group>
+                    </group>
+                    <group class="mt-2">
+                        <group>
+                            <field name="document_id" widget="many2many_tags" string="Document" />
+                        </group>
+                        <group>
+                            <button name="action_share_documents_direct" type="object" class="btn btn-primary" string="Share" />
+                        </group>
+                    </group>
+                    <group>
                         <field name="employee_ids" string="Employees" />
                     </group>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
