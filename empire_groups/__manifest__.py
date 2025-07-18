@@ -6,11 +6,17 @@
     "author": "ForgeFlow, Odoo Community Association (OCA)",
     "license": "LGPL-3",
     "website": "https://rdflex.com",
-    "depends": ["hr"],
+    "depends": ["hr", "documents"],
+    
     "data": [
         "security/ir.model.access.csv",
         "views/hr_employee_groups_views.xml",
         "views/menu.xml",
-        "wizard/employee_group_email_wizard_views.xml",
+        # "wizard/sign_send_request_wizard_views.xml",
     ],
+    'assets': {
+    'web.assets_backend': [
+        'empire_groups/static/src/js/open_documents_share_dialog.js',
+    ],
+},
 }

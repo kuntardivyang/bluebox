@@ -4,10 +4,8 @@
         <field name="name">hr.employee.groups.view.form</field>
         <field name="model">hr.employee.groups</field>
         <field name="arch" type="xml">
-            <form string="employee_groups">
-                <header>
-                    <button name="action_open_custom_email_wizard" type="object" class="oe_highlight" string="Custom Email" />
-                </header>
+            <form string="">
+
                 <sheet>
                     <group>
                         <field name="name" string="Group Name" required="1" />
@@ -18,7 +16,8 @@
                             <field name="template_id" string="Template" required="1" />
                         </group>
                         <group>
-                            <button name="action_send_sign_request" type="object" class="oe_highlight" string="Send Signature"/>
+                            <button name="action_send_sign_request" type="object"
+                                class="oe_highlight" string="Send" />
                         </group>
                     </group>
                     <group class="mt-2">
@@ -26,14 +25,14 @@
                             <field name="document_id" widget="many2many_tags" string="Document" />
                         </group>
                         <group>
-                            <button name="action_share_documents_direct" type="object" class="btn btn-primary" string="Share Document" />
+                            <button name="action_open_share_dialog" type="object"
+                                class="btn btn-primary" string="Share" invisible="not document_id" />
                         </group>
                     </group>
                     <group>
                         <field name="employee_ids" string="Employees" />
                     </group>
                 </sheet>
-                <chatter/>
             </form>
         </field>
     </record>
