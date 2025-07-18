@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 empire_groups.access_hr_employee_groups,access_hr_employee_groups,empire_groups.model_hr_employee_groups,base.group_user,1,1,1,1
+empire_groups.access_hr_employee_group_email_wizard,access_hr_employee_group_email_wizard,empire_groups.model_hr_employee_group_email_wizard,base.group_user,1,1,1,1

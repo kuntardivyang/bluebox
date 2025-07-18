@@ -17,33 +17,7 @@ class HREmployeeGroups(models.Model):
         domain="[('mimetype', 'in', ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])]",
         help='Select documents related to this group'
     )
-
-
-    def action_send_signature(self):
-        self.ensure_one()
-    
-        # Create sign request for each employee
-        for emp in self.employee_ids:
-            if not emp.work_email:
-                continue
-            
-            partner = self.env['res.partner'].search([('email', '=', emp.work_email)], limit=1)
-            if not partner:
-                partner = self.env['res.partner'].create({
-                    'name': emp.name,
-                    'email': emp.work_email,
-                })
-    
-            sign_request = self.env['sign.request'].create({
-                'template_id': self.template_id.id,
-                'request_item_ids': [(0, 0, {
-                    'partner_id': partner.id,
-                    'role_id': self.template_id.sign_item_ids[0].role_id.id,
-                })],
-            })
-    
-            sign_request._send_signature_request()
-    
+  
     
     def action_share_documents_direct(self):
         self.ensure_one()
@@ -85,7 +59,7 @@ class HREmployeeGroups(models.Model):
         if not self.template_id:
             raise UserError(_("Please set a signature template for this group."))
         
-        employees = self.employee_ids.filtered(lambda e: e.work_contact_id)
+        employees = self.employee_ids.filtered(lambda e: e.user_id.partner_id)
         if not employees:
             raise UserError(_("No employees with a work contact (partner) found in this group."))
 
@@ -96,7 +70,7 @@ class HREmployeeGroups(models.Model):
         for employee in employees:
             request_items = [
                 Command.create({
-                    'partner_id': employee.work_contact_id.id,
+                    'partner_id': employee.user_id.partner_id.id,
                     'role_id': role.id,
                     'mail_sent_order': 1,
                 }) for role in (roles if multiple_roles else [roles[0]])
@@ -107,6 +81,20 @@ class HREmployeeGroups(models.Model):
                 'reference': self.template_id.name or self.template_id.attachment_id.name,
                 'subject': _('Signature     Request - %s', self.template_id.attachment_id.name or ''),
             })
+            employee.message_post(
+            body=_("A signature request has been sent using template %s.") % self.template_id.name,
+            message_type="notification",
+            subtype_xmlid="mail.mt_note"
+        )
+
+        employee_names = ", ".join(employee.name for employee in employees)
+        message = _("Signature requests have been sent to the following employees: %s") % employee_names
+
+        self.message_post(
+            body=message,
+            message_type="notification",
+            subtype_xmlid="mail.mt_note",
+        )
 
         return {
             'type': 'ir.actions.client',
@@ -118,55 +106,28 @@ class HREmployeeGroups(models.Model):
                 'sticky': False,
             }
         }
-
-    # def action_send_sign_request(self):
-    #     self.ensure_one()
-    #     if not self.template_id:
-    #         raise UserError(_("Please set a signature template for this group."))
-
-    #     employees = self.employee_ids.filtered(lambda e: e.work_contact_id)
-    #     if not employees:
-    #         raise UserError(_("No employees with a work contact (partner) found in this group."))
-
-    #     roles = self.template_id.sign_item_ids.mapped('responsible_id').filtered(lambda r: r)
-    #     roles = roles or [self.env.ref('sign.sign_item_role_default')]
-
-    #     if len(roles) > 1 and len(roles) != len(employees):
-    #         raise UserError(_("Number of roles does not match number of employees."))
-
-    #     request_items = []
-    #     for index, employee in enumerate(employees):
-    #         role = roles[index] if len(roles) > 1 else roles[0]
-    #         request_items.append(Command.create({
-    #             'partner_id': employee.work_contact_id.id,
-    #             'role_id': role.id,
-    #             'mail_sent_order': 1,
-    #         }))
-
-    #     self.env['sign.request'].with_context(skip_role_validation=True).create({
-    #         'template_id': self.template_id.id,
-    #         'request_item_ids': request_items,
-    #         'reference': self.template_id.name or self.template_id.attachment_id.name,
-    #         'subject': _('Signature Request - %s', self.template_id.attachment_id.name or ''),
-    #     })
-
-    #     return {
-    #         'type': 'ir.actions.client',
-    #         'tag': 'display_notification',
-    #         'params': {
-    #             'title': _('Signature Request Sent'),
-    #             'message': _('The document has been sent to all employees for signature.'),
-    #             'type': 'success',
-    #             'sticky': False,
-    #         }
-    #     }
-
-
     
-class SignRequest(models.Model):
-    _inherit = "sign.request"
+    def action_open_custom_email_wizard(self):      
+        self.ensure_one()
+        partner_ids = self.employee_ids.mapped('user_id.partner_id').filtered(lambda p: p).ids
+        if not partner_ids:
+            raise UserError(_("No related partners found through user_id for the employees in this group."))
 
-    def _check_signers_roles_validity(self):
-        if self.env.context.get('skip_role_validation'):
-            return True
-        return super()._check_signers_roles_validity()
+        ctx = {
+            'default_model': 'hr.employee.groups',
+            'default_res_ids': [self.id],
+            'default_partner_ids': partner_ids,
+            'default_composition_mode': 'comment',
+            'default_email_layout_xmlid': 'mail.mail_notification_light',
+            'email_notification': True,
+            'force_email': True,
+        }
+        return {
+            'name': _('Send Email to Employees'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'mail.compose.message',
+            'view_mode': 'form',
+            'view_id': False,
+            'target': 'new',
+            'context': ctx,
+        }

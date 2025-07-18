@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <form string="employee_groups">
                 <header>
-                    <button class="oe_highlight" string="Custom Email" />
+                    <button name="action_open_custom_email_wizard" type="object" class="oe_highlight" string="Custom Email" />
                 </header>
                 <sheet>
                     <group>
@@ -18,7 +18,7 @@
                             <field name="template_id" string="Template" required="1" />
                         </group>
                         <group>
-                            <button name="action_send_sign_request" type="object" class="oe_highlight" string="Send"/>
+                            <button name="action_send_sign_request" type="object" class="oe_highlight" string="Send Signature"/>
                         </group>
                     </group>
                     <group class="mt-2">
@@ -26,7 +26,7 @@
                             <field name="document_id" widget="many2many_tags" string="Document" />
                         </group>
                         <group>
-                            <button name="action_share_documents_direct" type="object" class="btn btn-primary" string="Share" />
+                            <button name="action_share_documents_direct" type="object" class="btn btn-primary" string="Share Document" />
                         </group>
                     </group>
                     <group>
