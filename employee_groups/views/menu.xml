@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_hr_employee_groups" name="Groups" action="hr_employee_groups_action" parent="hr.menu_hr_root" sequence="3"/>
+</odoo>

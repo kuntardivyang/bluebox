@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_employee_groups_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.groups.view.form</field>
+        <field name="model">hr.employee.groups</field>
+        <field name="arch" type="xml">
+            <form string="employee_groups">
+                <header>
+                    <button name="action_open_custom_email_wizard" type="object" class="oe_highlight" string="Custom Email" />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name" string="Group Name" required="1" />
+                        <field name="description" string="Description" />
+                    </group>
+                    <group>
+                        <group>
+                            <field name="template_id" string="Template"/>
+                        </group>
+                        <group>
+                            <button name="action_send_sign_request" type="object" class="oe_highlight" string="Send Signature"/>
+                        </group>
+                    </group>
+                    <group class="mt-2">
+                        <group>
+                            <field name="document_id" widget="many2many_tags" string="Document" />
+                        </group>
+                       <group>
+                            <button name="action_open_share_dialog" type="object"
+                                class="btn btn-primary" string="Share Documents"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="employee_ids" string="Employees" />
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="hr_employee_groups_view_list" model="ir.ui.view">
+        <field name="name">hr_employee_groups.view.tree</field>
+        <field name="model">hr.employee.groups</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" string="Group Name" />
+                <field name="description" string="Description" />
+                <field name="employee_ids" widget="many2many_tags" string="Employees" />
+            </list>
+        </field>
+    </record>
+
+    <record id="hr_employee_groups_action" model="ir.actions.act_window">
+        <field name="name">Employee Groups</field>
+        <field name="res_model">hr.employee.groups</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling">
+                Create and manage groups of employees.
+            </p>
+        </field>
+    </record>
+
+</odoo>

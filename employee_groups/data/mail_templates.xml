@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="mail_template_employee_group" model="mail.template">
+            <field name="name">Email Template: Employee Group Notification</field>
+            <field name="model_id" ref="employee_groups.model_hr_employee_groups"/>
+            <field name="email_from">{{ object.env.user.company_id.email or object.env.user.email }}</field>
+            <field name="subject">Notification for Employee Group: {{object.name}}</field>
+            <field name="body_html" type="html">         
+                <div style="margin:0; padding:0;">
+                    <p>Hello Team,</p>
+                    <p>This is a notification sent to all employees of the group 
+                        <strong><t t-out="object.name"/></strong>.
+                    </p>
+                    <p><b>Description:</b> <t t-out="object.description or 'No description provided.'"/></p>
+                    <p>Members of this group:</p>
+                    <ul>
+                        <t t-foreach="object.employee_ids" t-as="emp">
+                            <li>
+                                <t t-out="emp.name"/> (<t t-out="emp.user_id.partner_id.email or 'No email'"/>)
+                            </li>
+                        </t>
+                    </ul>
+                    <br/>
+                    <p>Regards,<br/>
+                    <t t-out="object.env.user.name"/><br/>
+                    <t t-out="object.env.user.company_id.name"/></p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

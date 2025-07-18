@@ -1,0 +1,58 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Logs and databases
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Odoo generated files
+*.zip
+*.odoo_backup
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python virtual environment
+venv/
+.env/
+ENV/
+env/
+
+# Local settings and cache
+*.swp
+*.swo
+*.bak
+
+# Node.js dependencies (if you have web assets)
+node_modules/
+
+# Compiled translations
+*.mo
+
+# Test coverage reports
+htmlcov/
+.tox/
+.coverage
+coverage.xml
+
+# JetBrains IDE files
+*.iml
+*.ipr
+*.iws
